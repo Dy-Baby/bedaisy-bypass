@@ -1,0 +1,29 @@
+cmake_minimum_required(VERSION 3.25.1 FATAL_ERROR)
+set(PROJECT_NAME driver)
+set(CMAKE_CXX_STANDARD 17)
+
+project(${PROJECT_NAME})
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+
+get_filename_component(PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR} ABSOLUTE)
+set(OUTPUT_DIR ${PROJECT_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+set(CMAKE_CURRENT_BINARY_DIR ${OUTPUT_DIR})
+set(CMAKE_BINARY_DIR ${OUTPUT_DIR})
+set(PROJECT_BINARY_DIR ${OUTPUT_DIR})
+set(EXECUTABLE_OUTPUT_PATH ${OUTPUT_DIR})
+
+find_package(WDK REQUIRED)
+
+include_directories(${PROJECT_SOURCE_DIR}/src/)
+include_directories(${WDK_ROOT}/Include/${WDK_INC_VERSION}/shared/)
+include_directories(${WDK_ROOT}/Include/${WDK_INC_VERSION}/km/)
+include_directories(${WDK_ROOT}/Include/${WDK_INC_VERSION}/km/crt/)
+
+file(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/src/*.cpp)
+
+wdk_add_driver(${PROJECT_NAME} KMDF 1.31 NTDDI_VERSION 0x0A000800 ${SRC_FILES})
+target_precompile_headers(${PROJECT_NAME} PRIVATE src/pch.h)
